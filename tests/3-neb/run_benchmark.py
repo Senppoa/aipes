@@ -15,7 +15,7 @@ from amp.model.neuralnetwork import NeuralNetwork
 from amp import Amp
 
 import sys
-sys.path.append("../../../")
+sys.path.append("/home/yhli/proj/aipes")
 from aipes.common.dataset import Dataset
 from aipes.common.benchmark import benchmark
 

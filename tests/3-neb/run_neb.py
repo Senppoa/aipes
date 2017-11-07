@@ -12,7 +12,7 @@ from amp.model.neuralnetwork import NeuralNetwork
 from amp import Amp
 
 import sys
-sys.path.append("../../../")
+sys.path.append("/home/yhli/proj/aipes")
 from aipes.neb.serial import run_aineb
 
 
@@ -20,7 +20,7 @@ def main():
     # Declare controlling parameters
     initial_file = "initial.traj"
     final_file = "final.traj"
-    num_transition_states = 5
+    num_transition_states = 3
 
     train_file = "train.traj"
 
@@ -59,7 +59,7 @@ def gen_calc_amp():
                    "force_maxresid": 0.1}
     checkpoints = 500
     label = "amp/train"
-    cores = 5
+    cores = 2
     logging = False
 
     # --------------------------------------------------------------------------

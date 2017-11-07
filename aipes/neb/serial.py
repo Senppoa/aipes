@@ -18,6 +18,8 @@ from ase.io import read, write
 from ase.neb import NEB
 from ase.optimize import BFGS as OPT
 
+from amp import Amp
+
 from ..common.utilities import echo
 from ..common.benchmark import validate_energy, validate_forces
 
@@ -116,8 +118,14 @@ def run_aineb(initial_file, final_file, num_inter_images,
         Function that instantiates a reference (first principles) calculator.
 
     Returns
-    ------
+    -------
     None
+
+    CAUTION
+    -------
+    Amp calculators cannot be shared by more than one NEB images. So we have to
+    train it and then load it from disk for each of the images. In this case,
+    Amp calculators must be trained with 'overwrite=True' argument.
     """
     # Load the initial and final images and training dataset
     initial_image = read(initial_file, index=-1)
@@ -133,10 +141,13 @@ def run_aineb(initial_file, final_file, num_inter_images,
         echo("Training the Amp calculator...")
         calc_amp = gen_calc_amp()
         calc_amp.train(images=train_set, overwrite=True)
+        label = calc_amp.label
 
         # Build the initial MEP
         mep = initialize_mep(initial_image, final_image, num_inter_images)
         for image in mep[1:-1]:
+            calc_amp = Amp.load(label + ".amp", cores=1, label=label,
+                                logging=False)
             image.set_calculator(calc_amp)
 
         # Calculate the MEP from initial guess

@@ -57,7 +57,8 @@ def run_aineb(initial_file, final_file, num_inter_images,
     Amp calculator cannot be passed via MPI and will produce errors like
     "TypeError: cannot serialize '_io.TextIOWrapper'. So we have to train the
     Amp calculator on master node, write it to disk nd then have all the nodes
-    reload it.
+    reload it. In this case, Amp calculators must be trained with
+    'overwrite=True' argument.
     """
     # Initialize MPI environment
     comm = world.comm
