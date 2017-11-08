@@ -20,7 +20,7 @@ def main():
     # Declare controlling parameters
     initial_file = "initial.traj"
     final_file = "final.traj"
-    num_transition_states = 3
+    num_transition_states = 5
 
     train_file = "train.traj"
 

@@ -1,3 +1,3 @@
 # aipes
-AIPES is a library that combines the subroutines provided by the atomic
-simulation environment (ASE), such as the dimer method, nudged elastic band (NEB), molecular dynamics (MD), and global optimization (GO), with machine learning techniques. The key idea is to predict the potential energy surface (PES) with machine learning based calculator trained from reference data generated from first principles calculations.
+AIPES is a library that combines the subroutines provided by the atomic simulation environment (ASE), such as the dimer method, nudged elastic band (NEB), molecular dynamics (MD), and global optimization (GO), with machine learning techniques. The key idea is to predict the potential energy surface (PES) with  machine learning based calculator trained from reference data generated from first principles calculations. The predicted PES are then
+validated using first-principles based reference calculator, and new train data will be added to the training dataset to gradually improve the prediction quality.
