@@ -68,9 +68,9 @@ def validate_mep(mep, calc_amp, gen_calc_ref):
     """
     ref_images = []
 
-    # For parallel calculation the MEP passed in does not contain initial or
-    # final states, different from that in serial calculation.
-    for image in mep:
+    # For serial calculation the MEP passed in contains initial and
+    # final states, different from that in parallel calculation.
+    for image in mep[1:-1]:
         image_copy = image.copy()
         image_copy.set_calculator(gen_calc_ref())
 
