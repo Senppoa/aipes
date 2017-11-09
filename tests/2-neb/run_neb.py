@@ -17,6 +17,7 @@ from aipes.neb.serial import run_aineb
 
 
 def main():
+    # --------------------------------------------------------------------------
     # Declare controlling parameters
     initial_file = "initial.traj"
     final_file = "final.traj"
@@ -35,7 +36,8 @@ def main():
                 "interp": "linear",
                 "fmax": 0.05,
                 "steps": 50}
-    
+
+    # --------------------------------------------------------------------------
     # Run the job
     run_aineb(initial_file, final_file, num_transition_states,
               train_file, convergence, neb_args,
@@ -45,7 +47,6 @@ def main():
 def gen_calc_amp():
     """Returns an Amp calculator."""
     # --------------------------------------------------------------------------
-    #
     # Declare controlling parameters
     cutoff_radius = 6.5
     # nmax = 5
@@ -60,10 +61,9 @@ def gen_calc_amp():
     checkpoints = 500
     label = "amp/train"
     cores = 2
-    logging = False
+    logging = True
 
     # --------------------------------------------------------------------------
-    #
     # Instantiate the descriptor
     cutoff = Cosine(cutoff_radius)
     # descriptor = Zernike(cutoff=cutoff, Gs=gs, nmax=nmax)

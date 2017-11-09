@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 """
-Calculate the number of adjustable parameters of neural network 
-according to its topology.
+Calculate the number of adjustable parameters of neural network according to
+its topology.
 """
 
 import sys
@@ -12,7 +12,7 @@ def calc_size_descriptor(nmax):
     count = 0
     for n in range(nmax+1):
         for l in range(n+1):
-            if (n-l)%2 == 0:
+            if (n-l) % 2 == 0:
                 count += 1
     return count
 
@@ -30,7 +30,12 @@ def calc_num_parameter(nmax, hidden_layers):
     return count
 
 
-nmax = int(sys.argv[1])
-hidden_layers = [int(i) for i in sys.argv[2:]]
-print(calc_size_descriptor(nmax))
-print(calc_num_parameter(nmax, hidden_layers))
+def main():
+    nmax = int(sys.argv[1])
+    hidden_layers = [int(i) for i in sys.argv[2:]]
+    print(calc_size_descriptor(nmax))
+    print(calc_num_parameter(nmax, hidden_layers))
+
+
+if __name__ == "__main__":
+    main()

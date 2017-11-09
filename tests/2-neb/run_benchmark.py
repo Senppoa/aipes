@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 """
-This program generates fingerprints and their derivatives for the training
-data set to boost AI-NEB calculation.
-"""
+This program determines the optimal model parameters of Amp calculator.
 
-from ase.io import read
+Currently only the topology (hidden layers) is considered as the key
+convergence parameter. Others may be added later.
+"""
 
 from amp.descriptor.cutoffs import Cosine
 # from amp.descriptor.zernike import Zernike
@@ -14,39 +14,51 @@ from amp.model import LossFunction
 from amp.model.neuralnetwork import NeuralNetwork
 from amp import Amp
 
+import sys
+sys.path.append("/home/yhli/proj/aipes")
+from aipes.common.dataset import Dataset
+from aipes.common.benchmark import benchmark
+
 
 def main():
+    # --------------------------------------------------------------------------
     # Declare controlling parameters
-    train_file = "train.traj"
+    traj = "train.traj"
+    num_group = 5
+    num_node_min = 5
+    num_node_max = 5
+    step = 1
 
-    # Instantiate and train the calculator
-    train_set = read(train_file, index=":")
-    calc_amp = gen_calc_amp()
-    calc_amp.train(images=train_set)
+    # --------------------------------------------------------------------------
+    # Load and group the data set
+    all_data = Dataset(traj)
+    all_data.group(num_group, rand=True)
+
+    # Run cross-validation over num_node
+    for num_node in range(num_node_min, num_node_max+step, step):
+        hidden_layers = (num_node, num_node)
+        benchmark(gen_calc_amp, hidden_layers, all_data)
 
 
-def gen_calc_amp():
+def gen_calc_amp(hidden_layers):
     """Returns an Amp calculator."""
     # --------------------------------------------------------------------------
-    #
     # Declare controlling parameters
     cutoff_radius = 6.5
     # nmax = 5
     # gs = {"Al": {"Al": 6.0, "Au": 4.0}, "Au": {"Al": 4.0, "Au": 2.0}}
-    hidden_layers = (5, 5)
     activation = "tanh"
     optimizer = "BFGS"
-    convergence = {"energy_rmse": 0.1,
-                   "energy_maxresid": 0.2,
-                   "force_rmse": 0.5,
-                   "force_maxresid": 1.0}
+    convergence = {"energy_rmse": 0.001,
+                   "energy_maxresid": 0.002,
+                   "force_rmse": 0.05,
+                   "force_maxresid": 0.1}
     checkpoints = 500
     label = "amp/train"
-    cores = 10
+    cores = 2
     logging = True
 
     # --------------------------------------------------------------------------
-    #
     # Instantiate the descriptor
     cutoff = Cosine(cutoff_radius)
     # descriptor = Zernike(cutoff=cutoff, Gs=gs, nmax=nmax)
