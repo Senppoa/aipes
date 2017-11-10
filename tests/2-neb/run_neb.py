@@ -11,8 +11,6 @@ from amp.model import LossFunction
 from amp.model.neuralnetwork import NeuralNetwork
 from amp import Amp
 
-import sys
-sys.path.append("/home/yhli/proj/aipes")
 from aipes.neb.serial import run_aineb
 
 
@@ -35,7 +33,8 @@ def main():
                 "method": "aseneb",
                 "interp": "linear",
                 "fmax": 0.05,
-                "steps": 50}
+                "steps": 50,
+                "reuse_mep": True}
 
     # --------------------------------------------------------------------------
     # Run the job

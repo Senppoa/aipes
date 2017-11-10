@@ -144,7 +144,12 @@ def run_aineb(initial_file, final_file, num_inter_images,
         label = calc_amp.label
 
         # Build the initial MEP
-        mep = initialize_mep(initial_image, final_image, num_inter_images)
+        # For the first iteration or explicitly specified, we build the MEP
+        # from scratch. Otherwise we load it from previous iteration.
+        if iteration == 0 or neb_args["reuse_mep"] is False:
+            mep = initialize_mep(initial_image, final_image, num_inter_images)
+        else:
+            mep = read("mep.traj", index=":")
         for image in mep[1:-1]:
             calc_amp = Amp.load(label + ".amp", cores=1, label=label,
                                 logging=False)
@@ -166,6 +171,11 @@ def run_aineb(initial_file, final_file, num_inter_images,
             echo("%16s = %13.4e" % (key, value))
             converge_status.append(value <= convergence[key])
 
+        # Save the MEP
+        # For consistency with the parallel version, we place this piece of code
+        # here. In fact it is not mandatory.
+        write("mep.traj", mep)
+
         # Check if convergence has been reached
         if converge_status == [True, True, True, True]:
             is_converged = True
@@ -178,10 +188,6 @@ def run_aineb(initial_file, final_file, num_inter_images,
     if is_converged:
         echo("\nAI-NEB calculation converged."
              "\nThe MEP is saved in mep.traj.")
-        mep_final = [initial_image]
-        mep_final.extend(ref_images)
-        mep_final.append(final_image)
-        write("mep.traj", mep_final)
     else:
         echo("\nMaximum iteration number reached."
              "\nAI-NEB calculation not converged.")
