@@ -11,7 +11,7 @@ from amp.model import LossFunction
 from amp.model.neuralnetwork import NeuralNetwork
 from amp import Amp
 
-from aipes.neb.serial import run_aineb
+from aipes.neb.dynamic import run_aineb
 
 
 def main():

@@ -1,6 +1,6 @@
 """
-Serial version of NEB method based on machine learning PES with first
-principles correction.
+Parallel version of NEB method based on machine learning PES with first
+principles correction, with dynamic process management.
 
 Available functions
 -------------------
@@ -8,11 +8,11 @@ run_aineb:
     Performs NEB calculation with first principles corrections.
 """
 
-from ase.io import read, write
-from ase.neb import NEB
-from ase.optimize import BFGS as OPT
+import sys
 
-from amp import Amp
+from ase.io import read, write
+
+from mpi4py import MPI
 
 from ..common.utilities import echo
 from .common import initialize_mep, validate_mep
@@ -50,17 +50,22 @@ def run_aineb(initial_file, final_file, num_inter_images,
 
     CAUTION
     -------
-    Amp calculators cannot be shared by more than one NEB images. So we have to
-    train it and then load it from disk for each of the images. In this case,
-    Amp calculators must be trained with 'overwrite=True' argument.
+    We have to use parallel=False otherwise the MPI environment will be broken
+    and comm.bcast() will always fail. This annoying BUG has cost me many hours.
+
+    Amp calculator cannot be passed via MPI and will produce errors like
+    "TypeError: cannot serialize '_io.TextIOWrapper'. So we have to train the
+    Amp calculator on parent process, write it to disk and then have all the
+    child processes reload it. In this case, Amp calculators must be trained
+    with 'overwrite=True' argument.
     """
     # Load the initial and final images and training dataset
-    initial_image = read(initial_file, index=-1)
-    final_image = read(final_file, index=-1)
-    train_set = read(train_file, index=":")
+    initial_image = read(initial_file, index=-1, parallel=False)
+    final_image = read(final_file, index=-1, parallel=False)
+    train_set = read(train_file, index=":", parallel=False)
 
     # Main loop
-    echo("Serial AI-NEB running on 1 process.")
+    echo("Dynamic AI-NEB running on %d MPI processes." % num_inter_images)
     is_converged = False
     for iteration in range(convergence["max_iteration"]):
         echo("\nIteration # %d" % (iteration+1))
@@ -77,25 +82,23 @@ def run_aineb(initial_file, final_file, num_inter_images,
         if iteration == 0 or neb_args["reuse_mep"] is False:
             mep = initialize_mep(initial_image, final_image, num_inter_images)
         else:
-            mep = read("mep.traj", index=":")
-        for image in mep[1:-1]:
-            calc_amp = Amp.load(label + ".amp", cores=1, label=label,
-                                logging=False)
-            image.set_calculator(calc_amp)
+            mep = read("mep.traj", index=":", parallel=False)
 
-        # Calculate the MEP from initial guess
+        # Spawn MPI child processes and run NEB
         echo("Running NEB using the Amp calculator...")
-        neb_runner = NEB(mep, climb=neb_args["climb"],
-                         method=neb_args["method"])
-        neb_runner.interpolate(neb_args["interp"])
-        opt_runner = OPT(neb_runner)
-        opt_runner.run(fmax=neb_args["fmax"], steps=neb_args["steps"])
+        comm = MPI.COMM_SELF.Spawn(sys.executable,
+                                   args=["-m", "aipes.neb.child"],
+                                   maxprocs=num_inter_images)
+        comm.bcast(neb_args, root=MPI.ROOT)
+        comm.bcast(mep, root=MPI.ROOT)
+        comm.bcast(label, root=MPI.ROOT)
+        active_image = None
+        mep = comm.gather(active_image, root=MPI.ROOT)
+        comm.Disconnect()
 
         # Validate the MEP against the reference calculator
-        # Note that for serial version of run_aineb we have to pass mep[1:-1]
-        # to validate_mep instead of the whole mep.
         echo("Validating the MEP using reference calculator...")
-        accuracy, ref_images = validate_mep(mep[1:-1], calc_amp, gen_calc_ref)
+        accuracy, ref_images = validate_mep(mep, calc_amp, gen_calc_ref)
         converge_status = []
         for key, value in accuracy.items():
             echo("%16s = %13.4e" % (key, value))
@@ -107,7 +110,7 @@ def run_aineb(initial_file, final_file, num_inter_images,
         mep_save = [initial_image]
         mep_save.extend(ref_images)
         mep_save.append(final_image)
-        write("mep.traj", mep_save)
+        write("mep.traj", mep_save, parallel=False)
 
         # Check if convergence has been reached
         if converge_status == [True, True, True, True]:
@@ -115,7 +118,7 @@ def run_aineb(initial_file, final_file, num_inter_images,
             break
         else:
             train_set.extend(ref_images)
-            write("train_new.traj", train_set)
+            write("train_new.traj", train_set, parallel=False)
 
     # Summary
     if is_converged:
