@@ -10,7 +10,7 @@ run_aineb:
 
 from ase.io import read, write
 from ase.neb import NEB
-from ase.optimize import BFGS as OPT
+from ase.optimize import BFGS, FIRE
 
 from amp import Amp
 
@@ -85,10 +85,18 @@ def run_aineb(initial_file, final_file, num_inter_images,
 
         # Calculate the MEP from initial guess
         echo("Running NEB using the Amp calculator...")
-        neb_runner = NEB(mep, climb=neb_args["climb"],
+        neb_runner = NEB(mep,
+                         k=neb_args["k"],
+                         climb=neb_args["climb"],
+                         remove_rotation_and_translation=
+                         neb_args["remove_rotation_and_translation"],
                          method=neb_args["method"])
         neb_runner.interpolate(neb_args["interp"])
-        opt_runner = OPT(neb_runner)
+        if neb_args["opt_algorithm"] == "FIRE":
+            opt_algorithm = FIRE
+        else:
+            opt_algorithm = BFGS
+        opt_runner = opt_algorithm(neb_runner)
         opt_runner.run(fmax=neb_args["fmax"], steps=neb_args["steps"])
 
         # Validate the MEP against the reference calculator
