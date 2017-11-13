@@ -92,13 +92,14 @@ def run_aineb(initial_file, final_file, num_inter_images,
         calc_amp = Amp.load(label+".amp", cores=1, label=label, logging=False)
 
         # Build the initial MEP
-        # For the first iteration or explicitly specified, we build the MEP
-        # from scratch. Otherwise we load it from previous iteration.
         if rank == 0:
-            if iteration == 0 or neb_args["reuse_mep"] is False:
+            if ((iteration == 0 and neb_args["restart"] is False) or
+               (iteration != 0 and neb_args["reuse_mep"] is False)):
+                echo("Initial MEP built from scratch.", rank)
                 mep = initialize_mep(initial_image, final_image,
                                      num_inter_images)
             else:
+                echo("Initial MEP loaded from mep.traj.", rank)
                 mep = read("mep.traj", index=":", parallel=False)
         else:
             mep = None
@@ -114,7 +115,9 @@ def run_aineb(initial_file, final_file, num_inter_images,
                          neb_args["remove_rotation_and_translation"],
                          method=neb_args["method"],
                          parallel=True)
-        neb_runner.interpolate(neb_args["interp"])
+        if ((iteration == 0 and neb_args["restart"] is False) or
+           (iteration != 0 and neb_args["reuse_mep"] is False)):
+            neb_runner.interpolate(neb_args["interp"])
         if neb_args["opt_algorithm"] == "FIRE":
             opt_algorithm = FIRE
         else:

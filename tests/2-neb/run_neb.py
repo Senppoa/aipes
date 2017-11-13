@@ -37,6 +37,7 @@ def main():
                 "opt_algorithm": "BFGS",
                 "fmax": 0.05,
                 "steps": 50,
+                "restart": False,
                 "reuse_mep": False}
 
     # --------------------------------------------------------------------------

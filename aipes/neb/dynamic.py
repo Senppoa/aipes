@@ -77,11 +77,12 @@ def run_aineb(initial_file, final_file, num_inter_images,
         label = calc_amp.label
 
         # Build the initial MEP
-        # For the first iteration or explicitly specified, we build the MEP
-        # from scratch. Otherwise we load it from previous iteration.
-        if iteration == 0 or neb_args["reuse_mep"] is False:
+        if ((iteration == 0 and neb_args["restart"] is False) or
+           (iteration != 0 and neb_args["reuse_mep"] is False)):
+            echo("Initial MEP built from scratch.")
             mep = initialize_mep(initial_image, final_image, num_inter_images)
         else:
+            echo("Initial MEP loaded from mep.traj.")
             mep = read("mep.traj", index=":", parallel=False)
 
         # Spawn MPI child processes and run NEB
@@ -89,6 +90,7 @@ def run_aineb(initial_file, final_file, num_inter_images,
         comm = MPI.COMM_SELF.Spawn(sys.executable,
                                    args=["-m", "aipes.neb.child"],
                                    maxprocs=num_inter_images)
+        comm.bcast(iteration, root=MPI.ROOT)
         comm.bcast(neb_args, root=MPI.ROOT)
         comm.bcast(mep, root=MPI.ROOT)
         comm.bcast(label, root=MPI.ROOT)

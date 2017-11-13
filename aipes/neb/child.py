@@ -17,6 +17,7 @@ rank_world = comm_world.Get_rank()
 assert rank_parent == rank_world
 
 # Fetch data from parent process
+iteration = comm_parent.bcast(None, root=0)
 neb_args = comm_parent.bcast(None, root=0)
 mep = comm_parent.bcast(None, root=0)
 label = comm_parent.bcast(None, root=0)
@@ -33,7 +34,9 @@ neb_runner = NEB(mep,
                  neb_args["remove_rotation_and_translation"],
                  method=neb_args["method"],
                  parallel=True)
-neb_runner.interpolate(neb_args["interp"])
+if ((iteration == 0 and neb_args["restart"] is False) or
+   (iteration != 0 and neb_args["reuse_mep"] is False)):
+    neb_runner.interpolate(neb_args["interp"])
 if neb_args["opt_algorithm"] == "FIRE":
     opt_algorithm = FIRE
 else:
