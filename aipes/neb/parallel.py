@@ -11,7 +11,8 @@ run_aineb:
 from ase.io import read, write
 from ase.neb import NEB
 from ase.optimize import BFGS, FIRE
-from ase.parallel import world
+
+from mpi4py import MPI
 
 from amp import Amp
 
@@ -61,7 +62,7 @@ def run_aineb(initial_file, final_file, num_inter_images,
     'overwrite=True' argument.
     """
     # Initialize MPI environment
-    comm = world.comm
+    comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()
     assert size == num_inter_images
