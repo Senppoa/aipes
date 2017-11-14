@@ -7,6 +7,7 @@ from mpi4py import MPI
 from ase.neb import NEB
 from ase.optimize import BFGS, FIRE
 from amp import Amp
+from ..common.utilities import echo
 
 
 # Initialize MPI environment
@@ -27,9 +28,12 @@ calc_amp = Amp.load(label+".amp", cores=1, label=label, logging=False)
 mep[rank_world+1].set_calculator(calc_amp)
 
 # Run NEB
+# Both non-CI and CI NEB require non-CI steps specified by
+# neb_args["steps"][0]. So we set climb=False at the beginning.
+echo("Climbing image switched off.", rank_world)
 neb_runner = NEB(mep,
                  k=neb_args["k"],
-                 climb=neb_args["climb"],
+                 climb=False,
                  remove_rotation_and_translation=
                  neb_args["remove_rotation_and_translation"],
                  method=neb_args["method"],
@@ -42,7 +46,13 @@ if neb_args["opt_algorithm"] == "FIRE":
 else:
     opt_algorithm = BFGS
 opt_runner = opt_algorithm(neb_runner)
-opt_runner.run(fmax=neb_args["fmax"], steps=neb_args["steps"])
+opt_runner.run(fmax=neb_args["fmax"], steps=neb_args["steps"][0])
+# CI-NEB require additional steps specified by neb_args["steps"][1].
+if neb_args["climb"] is True:
+    echo("Climbing image switched on.", rank_world)
+    neb_runner.climb = True
+    opt_runner = opt_algorithm(neb_runner)
+    opt_runner.run(fmax=neb_args["fmax"], steps=neb_args["steps"][1])
 
 # Send MEP back to parent process
 active_image = mep[rank_world+1].copy()

@@ -30,13 +30,13 @@ def main():
                    "max_iteration": 1000}
 
     neb_args = {"k": 0.1,
-                "climb": False,
+                "climb": True,
                 "remove_rotation_and_translation": False,
                 "method": "aseneb",
                 "interp": "linear",
                 "opt_algorithm": "BFGS",
                 "fmax": 0.05,
-                "steps": 50,
+                "steps": [10, 40],
                 "restart": False,
                 "reuse_mep": False}
 

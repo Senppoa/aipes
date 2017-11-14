@@ -103,7 +103,7 @@ def run_aineb(initial_file, final_file, num_inter_images,
         accuracy, ref_images = validate_mep(mep, calc_amp, gen_calc_ref)
         converge_status = []
         for key, value in accuracy.items():
-            echo("%16s = %13.4e" % (key, value))
+            echo("%16s = %13.4e (%13.4e)" % (key, value, convergence[key]))
             converge_status.append(value <= convergence[key])
 
         # Save the MEP

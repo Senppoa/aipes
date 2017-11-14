@@ -85,10 +85,13 @@ def run_aineb(initial_file, final_file, num_inter_images,
             image.set_calculator(calc_amp)
 
         # Calculate the MEP from initial guess
+        # Both non-CI and CI NEB require non-CI steps specified by
+        # neb_args["steps"][0]. So we set climb=False at the beginning.
         echo("Running NEB using the Amp calculator...")
+        echo("Climbing image switched off.")
         neb_runner = NEB(mep,
                          k=neb_args["k"],
-                         climb=neb_args["climb"],
+                         climb=False,
                          remove_rotation_and_translation=
                          neb_args["remove_rotation_and_translation"],
                          method=neb_args["method"])
@@ -100,7 +103,13 @@ def run_aineb(initial_file, final_file, num_inter_images,
         else:
             opt_algorithm = BFGS
         opt_runner = opt_algorithm(neb_runner)
-        opt_runner.run(fmax=neb_args["fmax"], steps=neb_args["steps"])
+        opt_runner.run(fmax=neb_args["fmax"], steps=neb_args["steps"][0])
+        # CI-NEB require additional steps specified by neb_args["steps"][1].
+        if neb_args["climb"] is True:
+            echo("Climbing image switched on.")
+            neb_runner.climb = True
+            opt_runner = opt_algorithm(neb_runner)
+            opt_runner.run(fmax=neb_args["fmax"], steps=neb_args["steps"][1])
 
         # Validate the MEP against the reference calculator
         # Note that for serial version of run_aineb we have to pass mep[1:-1]
@@ -109,7 +118,7 @@ def run_aineb(initial_file, final_file, num_inter_images,
         accuracy, ref_images = validate_mep(mep[1:-1], calc_amp, gen_calc_ref)
         converge_status = []
         for key, value in accuracy.items():
-            echo("%16s = %13.4e" % (key, value))
+            echo("%16s = %13.4e (%13.4e)" % (key, value, convergence[key]))
             converge_status.append(value <= convergence[key])
 
         # Save the MEP
