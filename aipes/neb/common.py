@@ -11,6 +11,7 @@ validate_mep:
     has been reached.
 """
 
+from ..common.utilities import echo
 from ..common.benchmark import validate_energy, validate_forces
 
 
@@ -62,6 +63,7 @@ def validate_mep(mep, calc_amp, gen_calc_ref):
     # case for parallel version of run_aineb. For serial version, pass mep[1:-1]
     # instead of the whole mep to this function as the argument.
     for image in mep:
+        echo("Dealing with image # %d." % (mep.index(image) + 1))
         image_copy = image.copy()
         image_copy.set_calculator(gen_calc_ref())
 
