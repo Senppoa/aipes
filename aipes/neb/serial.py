@@ -107,7 +107,12 @@ def run_aineb(initial_file, final_file, num_inter_images,
         # CI-NEB require additional steps specified by neb_args["steps"][1].
         if neb_args["climb"] is True:
             echo("Climbing image switched on.")
-            neb_runner.climb = True
+            neb_runner = NEB(mep,
+                             k=neb_args["k"],
+                             climb=True,
+                             remove_rotation_and_translation=
+                             neb_args["remove_rotation_and_translation"],
+                             method=neb_args["method"])
             opt_runner = opt_algorithm(neb_runner)
             opt_runner.run(fmax=neb_args["fmax"], steps=neb_args["steps"][1])
 

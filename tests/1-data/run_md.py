@@ -31,7 +31,7 @@ def main():
 
     # Run molecular dynamics from each image in images
     for index, image in enumerate(images):
-        print("Dealing image # %d" % index, flush=True)
+        print("Dealing with image # %d." % index, flush=True)
         image.set_calculator(gen_calc())
         if index == 0:
             traj = Trajectory("md.traj", mode="w", atoms=image)

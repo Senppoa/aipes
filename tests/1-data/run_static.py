@@ -24,7 +24,7 @@ def main():
 
     # Calculate potential energy and forces for each image in images
     for image in images:
-        print("Dealing image # %d" % images.index(image), flush=True)
+        print("Dealing with image # %d." % images.index(image), flush=True)
         image.set_calculator(gen_calc())
         image.get_potential_energy(apply_constraint=False)
         image.get_forces(apply_constraint=False)
