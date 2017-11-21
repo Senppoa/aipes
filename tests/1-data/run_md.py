@@ -1,14 +1,13 @@
 #! /usr/bin/env python
 """Program for molecular dynamics."""
 
-import numpy as np
-
 from ase.io import read
 from ase.io.trajectory import Trajectory
 from ase.calculators.emt import EMT
 from ase import units
 from ase.md.velocitydistribution import MaxwellBoltzmannDistribution as MBDist
 from ase.md.verlet import VelocityVerlet
+from ase.neb import NEB
 
 
 def main():
@@ -47,12 +46,12 @@ def gen_calc():
 
 def interpolate(initial_image, final_image, num_inter_images):
     """Interpolate N intermediate images between initial and final images."""
-    displacement = final_image.get_positions() - initial_image.get_positions()
-    images = []
-    for ita in np.linspace(0.0, 1.0, num_inter_images+2):
-        image_copy = initial_image.copy()
-        image_copy.positions += ita * displacement
-        images.append(image_copy)
+    images = [initial_image]
+    for i in range(num_inter_images):
+        images.append(initial_image.copy())
+    images.append(final_image)
+    neb = NEB(images)
+    neb.interpolate("idpp")
     return images
 
 

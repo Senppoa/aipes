@@ -4,9 +4,12 @@ module.
 """
 
 from mpi4py import MPI
+
 from ase.neb import NEB
 from ase.optimize import BFGS, FIRE
+
 from amp import Amp
+
 from ..common.utilities import echo
 
 
