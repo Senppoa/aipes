@@ -4,7 +4,6 @@
 from ase.calculators.emt import EMT
 
 from amp.descriptor.cutoffs import Cosine
-# from amp.descriptor.zernike import Zernike
 from amp.descriptor.gaussian import Gaussian
 from amp.regression import Regressor
 from amp.model import LossFunction
@@ -52,8 +51,6 @@ def gen_calc_amp():
     # --------------------------------------------------------------------------
     # Declare controlling parameters
     cutoff_radius = 6.5
-    # nmax = 5
-    # gs = {"Al": {"Al": 6.0, "Au": 4.0}, "Au": {"Al": 4.0, "Au": 2.0}}
     hidden_layers = (5, 5)
     activation = "tanh"
     optimizer = "BFGS"
@@ -69,7 +66,6 @@ def gen_calc_amp():
     # --------------------------------------------------------------------------
     # Instantiate the descriptor
     cutoff = Cosine(cutoff_radius)
-    # descriptor = Zernike(cutoff=cutoff, Gs=gs, nmax=nmax)
     descriptor = Gaussian(cutoff=cutoff)
 
     # Instantiate the model

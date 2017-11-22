@@ -7,7 +7,6 @@ convergence parameter. Others may be added later.
 """
 
 from amp.descriptor.cutoffs import Cosine
-# from amp.descriptor.zernike import Zernike
 from amp.descriptor.gaussian import Gaussian
 from amp.regression import Regressor
 from amp.model import LossFunction
@@ -43,8 +42,6 @@ def gen_calc_amp(hidden_layers):
     # --------------------------------------------------------------------------
     # Declare controlling parameters
     cutoff_radius = 6.5
-    # nmax = 5
-    # gs = {"Al": {"Al": 6.0, "Au": 4.0}, "Au": {"Al": 4.0, "Au": 2.0}}
     activation = "tanh"
     optimizer = "BFGS"
     convergence = {"energy_rmse": 0.001,
@@ -59,7 +56,6 @@ def gen_calc_amp(hidden_layers):
     # --------------------------------------------------------------------------
     # Instantiate the descriptor
     cutoff = Cosine(cutoff_radius)
-    # descriptor = Zernike(cutoff=cutoff, Gs=gs, nmax=nmax)
     descriptor = Gaussian(cutoff=cutoff)
 
     # Instantiate the model
