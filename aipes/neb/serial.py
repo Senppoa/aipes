@@ -66,16 +66,24 @@ def run_aineb(initial_file, final_file, num_inter_images,
         echo("\nIteration # %d" % (iteration+1))
 
         # Train the Amp calculator
-        echo("Training Amp calculator...")
-        calc_amp = gen_calc_amp()
+        if ((iteration == 0 and neb_args["restart_with_calc"] is False) or
+           (iteration != 0 and neb_args["reuse_calc"] is False)):
+            echo("Initial Amp calculator built from scratch.")
+            reload = False
+        else:
+            echo("Initial Amp calculator loaded from previous training.")
+            reload = True
+        calc_amp = gen_calc_amp(reload=reload)
+        echo("Training the Amp calculator...")
         calc_amp.train(images=train_set, overwrite=True)
         label = calc_amp.label
 
         # Build the initial MEP
-        if ((iteration == 0 and neb_args["restart"] is False) or
+        if ((iteration == 0 and neb_args["restart_with_mep"] is False) or
            (iteration != 0 and neb_args["reuse_mep"] is False)):
             echo("Initial MEP built from scratch.")
-            mep = initialize_mep(initial_image, final_image, num_inter_images)
+            mep = initialize_mep(initial_image, final_image, num_inter_images,
+                                 neb_args["interp"])
         else:
             echo("Initial MEP loaded from mep.traj.")
             mep = read("mep.traj", index=":")
@@ -85,36 +93,30 @@ def run_aineb(initial_file, final_file, num_inter_images,
             image.set_calculator(calc_amp)
 
         # Calculate the MEP from initial guess
-        # Both non-CI and CI NEB require non-CI steps specified by
-        # neb_args["steps"][0]. So we set climb=False at the beginning.
         echo("Running NEB using the Amp calculator...")
-        echo("Climbing image switched off.")
-        neb_runner = NEB(mep,
-                         k=neb_args["k"],
-                         climb=False,
-                         remove_rotation_and_translation=
-                         neb_args["remove_rotation_and_translation"],
-                         method=neb_args["method"])
-        if ((iteration == 0 and neb_args["restart"] is False) or
-           (iteration != 0 and neb_args["reuse_mep"] is False)):
-            neb_runner.interpolate(neb_args["interp"])
-        if neb_args["opt_algorithm"] == "FIRE":
-            opt_algorithm = FIRE
-        else:
-            opt_algorithm = BFGS
-        opt_runner = opt_algorithm(neb_runner)
-        opt_runner.run(fmax=neb_args["fmax"], steps=neb_args["steps"][0])
-        # CI-NEB require additional steps specified by neb_args["steps"][1].
-        if neb_args["climb"] is True:
-            echo("Climbing image switched on.")
+        assert (len(neb_args["climb"]) ==
+                len(neb_args["opt_algorithm"]) ==
+                len(neb_args["fmax"]) ==
+                len(neb_args["steps"]))
+        for stage in range(len(neb_args["climb"])):
+            if neb_args["climb"][stage] is False:
+                echo("Climbing image switched off.")
+            else:
+                echo("Climbing image switched on.")
             neb_runner = NEB(mep,
                              k=neb_args["k"],
-                             climb=True,
+                             climb=neb_args["climb"][stage],
                              remove_rotation_and_translation=
-                             neb_args["remove_rotation_and_translation"],
+                             neb_args["rm_rot_trans"],
                              method=neb_args["method"])
+            # NOTE: interpolation is done in initialize_mep.
+            if neb_args["opt_algorithm"][stage] == "FIRE":
+                opt_algorithm = FIRE
+            else:
+                opt_algorithm = BFGS
             opt_runner = opt_algorithm(neb_runner)
-            opt_runner.run(fmax=neb_args["fmax"], steps=neb_args["steps"][1])
+            opt_runner.run(fmax=neb_args["fmax"][stage],
+                           steps=neb_args["steps"][stage])
 
         # Validate the MEP against the reference calculator
         # Note that for serial version of run_aineb we have to pass mep[1:-1]

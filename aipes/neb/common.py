@@ -11,16 +11,20 @@ validate_mep:
     has been reached.
 """
 
+from ase.neb import NEB
+
 from ..common.utilities import echo
 from ..common.benchmark import validate_energy, validate_forces
 
 
-def initialize_mep(initial_image, final_image, num_inter_images):
+def initialize_mep(initial_image, final_image, num_inter_images, interp):
     """Build the MEP from initial and final images."""
     mep = [initial_image]
     for i in range(num_inter_images):
         mep.append(initial_image.copy())
     mep.append(final_image)
+    neb_runner = NEB(mep)
+    neb_runner.interpolate(interp)
     return mep
 
 

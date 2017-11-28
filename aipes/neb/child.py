@@ -33,35 +33,30 @@ mep[rank_world+1].set_calculator(calc_amp)
 # Run NEB
 # Both non-CI and CI NEB require non-CI steps specified by
 # neb_args["steps"][0]. So we set climb=False at the beginning.
-echo("Climbing image switched off.", rank_world)
-neb_runner = NEB(mep,
-                 k=neb_args["k"],
-                 climb=False,
-                 remove_rotation_and_translation=
-                 neb_args["remove_rotation_and_translation"],
-                 method=neb_args["method"],
-                 parallel=True)
-if ((iteration == 0 and neb_args["restart"] is False) or
-   (iteration != 0 and neb_args["reuse_mep"] is False)):
-    neb_runner.interpolate(neb_args["interp"])
-if neb_args["opt_algorithm"] == "FIRE":
-    opt_algorithm = FIRE
-else:
-    opt_algorithm = BFGS
-opt_runner = opt_algorithm(neb_runner)
-opt_runner.run(fmax=neb_args["fmax"], steps=neb_args["steps"][0])
-# CI-NEB require additional steps specified by neb_args["steps"][1].
-if neb_args["climb"] is True:
-    echo("Climbing image switched on.", rank_world)
+assert (len(neb_args["climb"]) ==
+        len(neb_args["opt_algorithm"]) ==
+        len(neb_args["fmax"]) ==
+        len(neb_args["steps"]))
+for stage in range(len(neb_args["climb"])):
+    if neb_args["climb"][stage] is False:
+        echo("Climbing image switched off.", rank_world)
+    else:
+        echo("Climbing image switched on.", rank_world)
     neb_runner = NEB(mep,
                      k=neb_args["k"],
-                     climb=True,
+                     climb=neb_args["climb"][stage],
                      remove_rotation_and_translation=
-                     neb_args["remove_rotation_and_translation"],
+                     neb_args["rm_rot_trans"],
                      method=neb_args["method"],
                      parallel=True)
+    # NOTE: interpolation is done in initialize_mep.
+    if neb_args["opt_algorithm"][stage] == "FIRE":
+        opt_algorithm = FIRE
+    else:
+        opt_algorithm = BFGS
     opt_runner = opt_algorithm(neb_runner)
-    opt_runner.run(fmax=neb_args["fmax"], steps=neb_args["steps"][1])
+    opt_runner.run(fmax=neb_args["fmax"][stage],
+                   steps=neb_args["steps"][stage])
 
 # Send MEP back to parent process
 active_image = mep[rank_world+1].copy()

@@ -29,14 +29,16 @@ def main():
                    "max_iteration": 1000}
 
     neb_args = {"k": 0.1,
-                "climb": True,
-                "remove_rotation_and_translation": False,
-                "method": "aseneb",
-                "interp": "linear",
-                "opt_algorithm": "BFGS",
-                "fmax": 0.05,
-                "steps": [10, 40],
-                "restart": False,
+                "method": "eb",
+                "interp": "idpp",
+                "rm_rot_trans": False,
+                "climb": [False, True],
+                "opt_algorithm": ["FIRE", "BFGS"],
+                "fmax": [0.1, 0.05],
+                "steps": [20, 30],
+                "restart_with_calc": False,
+                "restart_with_mep": False,
+                "reuse_calc": False,
                 "reuse_mep": False}
 
     # --------------------------------------------------------------------------
@@ -46,7 +48,7 @@ def main():
               gen_calc_amp, gen_calc_ref)
     
 
-def gen_calc_amp():
+def gen_calc_amp(reload=False):
     """Returns an Amp calculator."""
     # --------------------------------------------------------------------------
     # Declare controlling parameters
@@ -76,9 +78,13 @@ def gen_calc_amp():
                           checkpoints=checkpoints, mode="atom-centered")
 
     # Instantiate the Amp calculator
-    calc = Amp(descriptor=descriptor, model=model, label=label, cores=cores,
-               logging=logging)
-
+    if reload is False:
+        calc = Amp(descriptor=descriptor, model=model, label=label, cores=cores,
+                   logging=logging)
+    else:
+        calc = Amp.load(label+".amp", cores=cores, label=label, logging=logging)
+        calc.model.regressor = regressor
+        calc.model.lossfunction = lossfunction
     return calc
 
 

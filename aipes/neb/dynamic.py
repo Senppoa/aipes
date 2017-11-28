@@ -71,16 +71,24 @@ def run_aineb(initial_file, final_file, num_inter_images,
         echo("\nIteration # %d" % (iteration+1))
 
         # Train the Amp calculator
-        echo("Training Amp calculator...")
-        calc_amp = gen_calc_amp()
+        if ((iteration == 0 and neb_args["restart_with_calc"] is False) or
+           (iteration != 0 and neb_args["reuse_calc"] is False)):
+            echo("Initial Amp calculator built from scratch.")
+            reload = False
+        else:
+            echo("Initial Amp calculator loaded from previous training.")
+            reload = True
+        calc_amp = gen_calc_amp(reload=reload)
+        echo("Training the Amp calculator...")
         calc_amp.train(images=train_set, overwrite=True)
         label = calc_amp.label
 
         # Build the initial MEP
-        if ((iteration == 0 and neb_args["restart"] is False) or
+        if ((iteration == 0 and neb_args["restart_with_mep"] is False) or
            (iteration != 0 and neb_args["reuse_mep"] is False)):
             echo("Initial MEP built from scratch.")
-            mep = initialize_mep(initial_image, final_image, num_inter_images)
+            mep = initialize_mep(initial_image, final_image, num_inter_images,
+                                 neb_args["interp"])
         else:
             echo("Initial MEP loaded from mep.traj.")
             mep = read("mep.traj", index=":", parallel=False)
