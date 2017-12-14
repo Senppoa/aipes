@@ -1,15 +1,21 @@
 """
 Shared subroutines by various versions of run_aineb.
 
-Available modules
------------------
+Available functions
+-------------------
 initialize_mep:
     Build the initial minimum energy path (MEP) from initial and final images.
 validate_mep:
     Check the difference between energies/forces produced by Amp and first
     principles calculators for images along the MEP to determine if convergence
     has been reached.
+wash_data:
+    Remove images in the training data set that will degrade training quality.
 """
+
+import time
+
+import numpy as np
 
 from ase.neb import NEB
 
@@ -17,14 +23,14 @@ from ..common.utilities import echo
 from ..common.benchmark import validate_energy, validate_forces
 
 
-def initialize_mep(initial_image, final_image, num_inter_images, interp):
+def initialize_mep(initial_image, final_image, num_inter_images, neb_args):
     """Build the MEP from initial and final images."""
     mep = [initial_image]
     for i in range(num_inter_images):
         mep.append(initial_image.copy())
     mep.append(final_image)
     neb_runner = NEB(mep)
-    neb_runner.interpolate(interp)
+    neb_runner.interpolate(method=neb_args["interp"], mic=neb_args["mic"])
     return mep
 
 
@@ -66,8 +72,9 @@ def validate_mep(mep, calc_amp, gen_calc_ref):
     # We assume that mep DOES NOT contain initial and final images, which is the
     # case for parallel version of run_aineb. For serial version, pass mep[1:-1]
     # instead of the whole mep to this function as the argument.
-    for image in mep:
-        echo("Dealing with image # %d." % (mep.index(image) + 1))
+    for index, image in enumerate(mep):
+        t0 = time.strftime("%H:%M:%S")
+        echo("Dealing with image # %d at %s." % (index+1, t0))
         image_copy = image.copy()
         image_copy.set_calculator(gen_calc_ref())
 
@@ -86,3 +93,14 @@ def validate_mep(mep, calc_amp, gen_calc_ref):
                 "force_rmse": force_rmse, "force_maxresid": force_maxresid}
 
     return accuracy, ref_images
+
+
+def wash_data(raw_data, fmax=10.0):
+    """Remove images that will degrade training quality."""
+    washed_data = []
+    for image in raw_data:
+        forces = image.get_forces(apply_constraint=False)
+        forces_mod = np.array([np.sqrt(np.sum(v**2)) for v in forces])
+        if np.max(forces_mod) <= fmax:
+            washed_data.append(image)
+    return washed_data

@@ -106,7 +106,7 @@ def run_aineb(initial_file, final_file, num_inter_images,
                (iteration != 0 and neb_args["reuse_mep"] is False)):
                 echo("Initial MEP built from scratch.", rank)
                 mep = initialize_mep(initial_image, final_image,
-                                     num_inter_images, neb_args["interp"])
+                                     num_inter_images, neb_args)
             else:
                 echo("Initial MEP loaded from mep.traj.", rank)
                 mep = read("mep.traj", index=":", parallel=False)

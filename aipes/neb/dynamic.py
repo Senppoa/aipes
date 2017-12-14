@@ -15,7 +15,7 @@ from ase.io import read, write
 from mpi4py import MPI
 
 from ..common.utilities import echo
-from .common import initialize_mep, validate_mep
+from .common import initialize_mep, validate_mep, wash_data
 
 
 def run_aineb(initial_file, final_file, num_inter_images,
@@ -88,7 +88,7 @@ def run_aineb(initial_file, final_file, num_inter_images,
            (iteration != 0 and neb_args["reuse_mep"] is False)):
             echo("Initial MEP built from scratch.")
             mep = initialize_mep(initial_image, final_image, num_inter_images,
-                                 neb_args["interp"])
+                                 neb_args)
         else:
             echo("Initial MEP loaded from mep.traj.")
             mep = read("mep.traj", index=":", parallel=False)
@@ -127,6 +127,8 @@ def run_aineb(initial_file, final_file, num_inter_images,
             is_converged = True
             break
         else:
+            ref_images = wash_data(ref_images, fmax=10.0)
+            echo("Adding %d new images to training data." % len(ref_images))
             train_set.extend(ref_images)
             write("train_new.traj", train_set, parallel=False)
 
