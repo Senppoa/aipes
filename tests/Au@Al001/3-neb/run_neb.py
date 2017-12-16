@@ -5,6 +5,7 @@ from ase.calculators.emt import EMT
 
 from amp.descriptor.cutoffs import Cosine
 from amp.descriptor.gaussian import Gaussian
+# from amp.descriptor.zernike import Zernike
 from amp.regression import Regressor
 from amp.model import LossFunction
 from amp.model.neuralnetwork import NeuralNetwork
@@ -20,31 +21,42 @@ def main():
     final_file = "final.traj"
     num_inter_images = 5
 
-    train_file = "train.traj"
+    control_args = {
+        "restart_with_calc": False,
+        "restart_with_mep": False,
+        "reuse_calc": True,
+        "reuse_mep": False
+    }
 
-    convergence = {"energy_rmse": 0.001,
-                   "energy_maxresid": 0.002,
-                   "force_rmse": 0.05,
-                   "force_maxresid": 0.1,
-                   "max_iteration": 1000}
+    dataset_args = {
+        "train_file": "train.traj",
+        "image_fmax": 10.0
+    }
 
-    neb_args = {"k": 0.1,
-                "method": "eb",
-                "interp": "idpp",
-                "rm_rot_trans": False,
-                "climb": [False, True],
-                "opt_algorithm": ["FIRE", "BFGS"],
-                "fmax": [0.1, 0.05],
-                "steps": [20, 30],
-                "restart_with_calc": False,
-                "restart_with_mep": False,
-                "reuse_calc": False,
-                "reuse_mep": False}
+    convergence = {
+        "energy_rmse": 0.001,
+        "energy_maxresid": 0.002,
+        "force_rmse": 0.05,
+        "force_maxresid": 0.10,
+        "max_iteration": 1000
+    }
+
+    neb_args = {
+        "k": 5.0,
+        "method": "improvedtangent",
+        "interp": "idpp",
+        "mic": True,
+        "rm_rot_trans": False,
+        "climb": [False, True],
+        "opt_algorithm": ["BFGS", "FIRE"],
+        "fmax": [0.5, 0.05],
+        "steps": [10, 40],
+    }
 
     # --------------------------------------------------------------------------
     # Run the job
     run_aineb(initial_file, final_file, num_inter_images,
-              train_file, convergence, neb_args,
+              control_args, dataset_args, convergence, neb_args,
               gen_calc_amp, gen_calc_ref)
     
 
@@ -56,19 +68,22 @@ def gen_calc_amp(reload=False):
     hidden_layers = (5, 5)
     activation = "tanh"
     optimizer = "BFGS"
-    convergence = {"energy_rmse": 0.001,
-                   "energy_maxresid": 0.002,
-                   "force_rmse": 0.05,
-                   "force_maxresid": 0.1}
+    convergence = {
+        "energy_rmse": 0.001,
+        "energy_maxresid": 0.002,
+        "force_rmse": 0.05,
+        "force_maxresid": 0.10
+    }
     checkpoints = 500
     label = "amp/train"
-    cores = 5
+    cores = 20
     logging = True
 
     # --------------------------------------------------------------------------
     # Instantiate the descriptor
     cutoff = Cosine(cutoff_radius)
     descriptor = Gaussian(cutoff=cutoff)
+    # descriptor = Zernike(cutoff=cutoff)
 
     # Instantiate the model
     regressor = Regressor(optimizer=optimizer)

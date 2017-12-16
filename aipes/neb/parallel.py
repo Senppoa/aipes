@@ -17,11 +17,11 @@ from mpi4py import MPI
 from amp import Amp
 
 from ..common.utilities import echo
-from .common import initialize_mep, validate_mep
+from .common import initialize_mep, validate_mep, wash_data
 
 
 def run_aineb(initial_file, final_file, num_inter_images,
-              train_file, convergence, neb_args,
+              control_args, dataset_args, convergence, neb_args,
               gen_calc_amp, gen_calc_ref):
     """
     Performs NEB calculation with first principles corrections.
@@ -34,9 +34,10 @@ def run_aineb(initial_file, final_file, num_inter_images,
         energies.
     num_inter_images: integer
         Number of intermediate images between initial and final images of MEP.
-    train_file: ASE trajectory file
-        Trajectory containing the training data. Generated from first principle
-        calculations.
+    control_args: dictionary
+        Arguments controlling the restart and reuse behaviors.
+    dataset_args: dictionary
+        Arguments controlling the training dataset.
     convergence: dictionary
         Convergence criteria.
     neb_args: dictionary
@@ -71,7 +72,7 @@ def run_aineb(initial_file, final_file, num_inter_images,
     if rank == 0:
         initial_image = read(initial_file, index=-1, parallel=False)
         final_image = read(final_file, index=-1, parallel=False)
-        train_set = read(train_file, index=":", parallel=False)
+        train_set = read(dataset_args["train_file"], index=":", parallel=False)
 
     # Main loop
     echo("Parallel AI-NEB running on %d MPI processes." % size, rank)
@@ -83,8 +84,8 @@ def run_aineb(initial_file, final_file, num_inter_images,
         # While the master process is training the calculator, we call
         # comm.bcast() to suspend the other processes.
         if rank == 0:
-            if ((iteration == 0 and neb_args["restart_with_calc"] is False) or
-               (iteration != 0 and neb_args["reuse_calc"] is False)):
+            if ((iteration == 0 and control_args["restart_with_calc"] is False) or
+               (iteration != 0 and control_args["reuse_calc"] is False)):
                 echo("Initial Amp calculator built from scratch.", rank)
                 reload = False
             else:
@@ -102,8 +103,8 @@ def run_aineb(initial_file, final_file, num_inter_images,
 
         # Build the initial MEP
         if rank == 0:
-            if ((iteration == 0 and neb_args["restart_with_mep"] is False) or
-               (iteration != 0 and neb_args["reuse_mep"] is False)):
+            if ((iteration == 0 and control_args["restart_with_mep"] is False) or
+               (iteration != 0 and control_args["reuse_mep"] is False)):
                 echo("Initial MEP built from scratch.", rank)
                 mep = initialize_mep(initial_image, final_image,
                                      num_inter_images, neb_args)
@@ -173,6 +174,8 @@ def run_aineb(initial_file, final_file, num_inter_images,
             break
         else:
             if rank == 0:
+                ref_images = wash_data(ref_images, dataset_args["image_fmax"])
+                echo("Adding %d new images to training data." % len(ref_images))
                 train_set.extend(ref_images)
                 write("train_new.traj", train_set, parallel=False)
 

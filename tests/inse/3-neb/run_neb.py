@@ -23,32 +23,42 @@ def main():
     final_file = "final.traj"
     num_inter_images = 4
 
-    train_file = "train.traj"
+    control_args = {
+        "restart_with_calc": False,
+        "restart_with_mep": False,
+        "reuse_calc": True,
+        "reuse_mep": False
+    }
 
-    convergence = {"energy_rmse": 0.001,
-                   "energy_maxresid": 0.002,
-                   "force_rmse": 0.05,
-                   "force_maxresid": 0.15,
-                   "max_iteration": 1000}
+    dataset_args = {
+        "train_file": "train.traj",
+        "image_fmax": 10.0
+    }
 
-    neb_args = {"k": 5.0,
-                "method": "improvedtangent",
-                "interp": "idpp",
-                "mic": True,
-                "rm_rot_trans": False,
-                "climb": [False, True],
-                "opt_algorithm": ["BFGS", "FIRE"],
-                "fmax": [0.5, 0.1],
-                "steps": [10, 40],
-                "restart_with_calc": True,
-                "restart_with_mep": False,
-                "reuse_calc": True,
-                "reuse_mep": False}
+    convergence = {
+        "energy_rmse": 0.001,
+        "energy_maxresid": 0.002,
+        "force_rmse": 0.05,
+        "force_maxresid": 0.15,
+        "max_iteration": 1000
+    }
+
+    neb_args = {
+        "k": 5.0,
+        "method": "improvedtangent",
+        "interp": "idpp",
+        "mic": True,
+        "rm_rot_trans": False,
+        "climb": [False, True],
+        "opt_algorithm": ["BFGS", "FIRE"],
+        "fmax": [0.5, 0.1],
+        "steps": [10, 40],
+    }
 
     # --------------------------------------------------------------------------
     # Run the job
     run_aineb(initial_file, final_file, num_inter_images,
-              train_file, convergence, neb_args,
+              control_args, dataset_args, convergence, neb_args,
               gen_calc_amp, gen_calc_ref)
     
 
@@ -60,10 +70,12 @@ def gen_calc_amp(reload=False):
     hidden_layers = (10, 10)
     activation = "tanh"
     optimizer = "BFGS"
-    convergence = {"energy_rmse": 0.001,
-                   "energy_maxresid": 0.002,
-                   "force_rmse": 0.05,
-                   "force_maxresid": 0.15}
+    convergence = {
+        "energy_rmse": 0.001,
+        "energy_maxresid": 0.002,
+        "force_rmse": 0.05,
+        "force_maxresid": 0.15
+    }
     checkpoints = 500
     label = "amp/train"
     cores = 20
