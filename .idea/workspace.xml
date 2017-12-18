@@ -2,23 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6d82ce76-42f2-43f1-8870-21046c149cd8" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/tests/Au@Al001/1-opt/ref/final.log" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/tests/Au@Al001/1-opt/ref/final.traj" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/tests/Au@Al001/1-opt/ref/initial.log" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/tests/Au@Al001/1-opt/ref/initial.traj" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/tests/Au@Al001/1-opt/run_opt_fs.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/tests/Au@Al001/1-opt/run_opt_is.py" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/tests/Au@Al001/2-data/ref/static.traj" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/tests/Au@Al001/3-neb/ref/mep.traj" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/tests/Au@Al001/3-neb/ref/neb.out" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/tests/Au@Al001/3-neb/ref/train_new.traj" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/aipes/neb/child.py" afterPath="$PROJECT_DIR$/aipes/neb/child.py" />
-      <change beforePath="$PROJECT_DIR$/aipes/neb/dynamic.py" afterPath="$PROJECT_DIR$/aipes/neb/dynamic.py" />
-      <change beforePath="$PROJECT_DIR$/aipes/neb/parallel.py" afterPath="$PROJECT_DIR$/aipes/neb/parallel.py" />
-      <change beforePath="$PROJECT_DIR$/aipes/neb/serial.py" afterPath="$PROJECT_DIR$/aipes/neb/serial.py" />
-      <change beforePath="$PROJECT_DIR$/tests/Au@Al001/3-neb/run_neb.py" afterPath="$PROJECT_DIR$/tests/Au@Al001/3-neb/run_neb.py" />
-      <change beforePath="$PROJECT_DIR$/tests/inse/3-neb/run_neb.py" afterPath="$PROJECT_DIR$/tests/inse/3-neb/run_neb.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -431,7 +415,14 @@
       <option name="project" value="LOCAL" />
       <updated>1513411056856</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Implemented adaptive NEB parameters.">
+      <created>1513605488546</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1513605488546</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TodoView">
@@ -551,7 +542,8 @@
     <MESSAGE value="Multi-stage NEB and retraining from previous amp calculator implemented." />
     <MESSAGE value="Implemented removal of training images with large forces from mep." />
     <MESSAGE value="Reorganization of the interface of function 'run_aineb'." />
-    <option name="LAST_COMMIT_MESSAGE" value="Reorganization of the interface of function 'run_aineb'." />
+    <MESSAGE value="Implemented adaptive NEB parameters." />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented adaptive NEB parameters." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -753,6 +745,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="357">
           <caret line="177" column="56" lean-forward="false" selection-start-line="177" selection-start-column="56" selection-end-line="177" selection-end-column="56" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -760,6 +753,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="385">
           <caret line="143" column="48" lean-forward="false" selection-start-line="143" selection-start-column="48" selection-end-line="143" selection-end-column="48" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -767,6 +761,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="283">
           <caret line="128" column="49" lean-forward="false" selection-start-line="128" selection-start-column="49" selection-end-line="128" selection-end-column="49" />
+          <folding />
         </state>
       </provider>
     </entry>
