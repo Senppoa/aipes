@@ -1,0 +1,218 @@
+Dynamic AI-NEB running on 5 MPI processes.
+
+Iteration # 1
+Initial Amp calculator built from scratch.
+Training the Amp calculator...
+Initial MEP built from scratch.
+Running NEB using the Amp calculator...
+Climbing image switched off.
+      Step     Time          Energy         fmax
+BFGS:    0 20:47:50        4.276039        3.7663
+BFGS:    1 20:47:58        3.990402        3.8908
+BFGS:    2 20:48:07        3.748351        3.2804
+BFGS:    3 20:48:15        3.583188        2.5566
+BFGS:    4 20:48:24        3.488348        2.0373
+BFGS:    5 20:48:32        3.419171        1.6848
+BFGS:    6 20:48:41        3.361569        1.3787
+BFGS:    7 20:48:49        3.314240        1.1283
+BFGS:    8 20:48:57        3.275289        0.9238
+BFGS:    9 20:49:06        3.243360        0.7565
+Climbing image switched on.
+      Step     Time          Energy         fmax
+*Force-consistent energies used in optimization.
+FIRE:    0 20:49:14        3.217302*       0.6194
+FIRE:    1 20:49:23        3.213473*       0.5984
+FIRE:    2 20:49:31        3.206290*       0.5592
+FIRE:    3 20:49:39        3.196578*       0.5064
+FIRE:    4 20:49:48        3.185345*       0.4456
+FIRE:    5 20:49:56        3.173584*       0.3820
+FIRE:    6 20:50:05        3.162103*       0.3197
+FIRE:    7 20:50:13        3.151443*       0.2615
+FIRE:    8 20:50:21        3.140918*       0.2125
+FIRE:    9 20:50:30        3.130778*       0.1697
+FIRE:   10 20:50:38        3.120842*       0.1315
+FIRE:   11 20:50:46        3.111391*       0.1288
+FIRE:   12 20:50:54        3.104180*       0.1313
+FIRE:   13 20:51:02        3.097111*       0.1504
+FIRE:   14 20:51:11        3.089347*       0.1771
+FIRE:   15 20:51:19        3.080908*       0.2104
+FIRE:   16 20:51:27        3.072326*       0.2389
+FIRE:   17 20:51:36        3.064101*       0.2595
+FIRE:   18 20:51:44        3.057044*       0.2678
+FIRE:   19 20:51:52        3.052146*       0.2841
+FIRE:   20 20:52:01        3.050508*       0.3136
+FIRE:   21 20:52:09        3.053327*       0.3306
+FIRE:   22 20:52:17        3.061879*       0.3309
+FIRE:   23 20:52:26        3.077344*       0.3108
+FIRE:   24 20:52:34        3.100354*       0.3167
+FIRE:   25 20:52:43        3.130244*       0.3317
+FIRE:   26 20:52:51        3.163936*       0.3366
+FIRE:   27 20:53:00        3.196093*       0.3312
+FIRE:   28 20:53:08        3.222348*       0.3378
+FIRE:   29 20:53:17        3.248704*       0.3967
+FIRE:   30 20:53:25        3.287278*       0.5653
+FIRE:   31 20:53:34        3.306914*       0.7872
+FIRE:   32 20:53:42        3.295803*       0.7448
+FIRE:   33 20:53:51        3.269164*       0.7266
+FIRE:   34 20:53:59        3.248925*       1.0846
+FIRE:   35 20:54:08        3.252143*       2.0135
+FIRE:   36 20:54:16        3.282690*       2.9572
+FIRE:   37 20:54:24        3.282991*       2.7378
+FIRE:   38 20:54:33        3.233779*       1.5652
+FIRE:   39 20:54:41        3.202917*       0.8011
+Validating the MEP using reference calculator...
+Dealing with image # 1 at 20:54:41.
+Dealing with image # 2 at 20:54:41.
+Dealing with image # 3 at 20:54:41.
+Dealing with image # 4 at 20:54:41.
+Dealing with image # 5 at 20:54:41.
+     energy_rmse =    2.1374e-01 (   1.0000e-03)
+      force_rmse =    3.5912e-01 (   5.0000e-02)
+ energy_maxresid =    3.0764e-01 (   2.0000e-03)
+  force_maxresid =    1.8273e+00 (   1.0000e-01)
+Adding 5 new images to training data.
+
+Iteration # 2
+Initial Amp calculator loaded from previous training.
+Training the Amp calculator...
+Initial MEP built from scratch.
+Running NEB using the Amp calculator...
+Climbing image switched off.
+      Step     Time          Energy         fmax
+BFGS:    0 20:55:28        4.282758        3.7520
+BFGS:    1 20:55:37        4.038162        3.0081
+BFGS:    2 20:55:45        3.870958        2.1634
+BFGS:    3 20:55:53        3.780088        1.4071
+BFGS:    4 20:56:01        3.734389        0.8692
+BFGS:    5 20:56:10        3.701362        0.6022
+BFGS:    6 20:56:18        3.678583        0.4978
+Climbing image switched on.
+      Step     Time          Energy         fmax
+*Force-consistent energies used in optimization.
+FIRE:    0 20:56:18        3.678583*       0.4978
+FIRE:    1 20:56:26        3.673495*       0.3401
+FIRE:    2 20:56:34        3.667543*       0.2304
+FIRE:    3 20:56:42        3.663134*       0.2316
+FIRE:    4 20:56:50        3.659564*       0.2168
+FIRE:    5 20:56:59        3.655701*       0.1778
+FIRE:    6 20:57:07        3.651570*       0.1520
+FIRE:    7 20:57:15        3.647958*       0.1381
+FIRE:    8 20:57:23        3.645157*       0.1346
+FIRE:    9 20:57:31        3.642859*       0.2041
+FIRE:   10 20:57:39        3.639824*       0.2128
+FIRE:   11 20:57:47        3.635920*       0.1667
+FIRE:   12 20:57:55        3.633308*       0.0849
+FIRE:   13 20:58:03        3.633199*       0.0968
+FIRE:   14 20:58:12        3.632973*       0.0911
+FIRE:   15 20:58:20        3.632624*       0.0836
+FIRE:   16 20:58:28        3.632303*       0.0735
+FIRE:   17 20:58:36        3.632127*       0.0617
+Validating the MEP using reference calculator...
+Dealing with image # 1 at 20:58:44.
+FIRE:   18 20:58:44        3.632091*       0.0492
+Dealing with image # 2 at 20:58:44.
+Dealing with image # 3 at 20:58:44.
+Dealing with image # 4 at 20:58:44.
+Dealing with image # 5 at 20:58:44.
+     energy_rmse =    8.8563e-03 (   1.0000e-03)
+      force_rmse =    8.9125e-02 (   5.0000e-02)
+ energy_maxresid =    1.0177e-02 (   2.0000e-03)
+  force_maxresid =    5.2169e-01 (   1.0000e-01)
+Adding 5 new images to training data.
+
+Iteration # 3
+Initial Amp calculator loaded from previous training.
+Training the Amp calculator...
+Initial MEP built from scratch.
+Running NEB using the Amp calculator...
+Climbing image switched off.
+      Step     Time          Energy         fmax
+BFGS:    0 20:58:55        4.278582        3.7775
+BFGS:    1 20:59:04        4.031088        2.7331
+BFGS:    2 20:59:12        3.861234        1.8721
+BFGS:    3 20:59:21        3.761567        1.0955
+BFGS:    4 20:59:30        3.715682        0.4712
+Climbing image switched on.
+      Step     Time          Energy         fmax
+*Force-consistent energies used in optimization.
+FIRE:    0 20:59:30        3.715682*       0.4712
+FIRE:    1 20:59:39        3.712340*       0.4241
+FIRE:    2 20:59:47        3.706665*       0.3383
+FIRE:    3 20:59:56        3.700153*       0.2290
+FIRE:    4 21:00:05        3.694107*       0.1651
+FIRE:    5 21:00:13        3.689214*       0.1484
+FIRE:    6 21:00:22        3.685574*       0.1326
+FIRE:    7 21:00:30        3.682997*       0.1463
+FIRE:    8 21:00:38        3.681127*       0.1349
+FIRE:    9 21:00:47        3.680023*       0.0961
+FIRE:   10 21:00:55        3.679451*       0.1257
+FIRE:   11 21:01:03        3.679291*       0.1220
+FIRE:   12 21:01:12        3.678987*       0.1148
+FIRE:   13 21:01:20        3.678568*       0.1043
+FIRE:   14 21:01:29        3.678070*       0.0911
+FIRE:   15 21:01:37        3.677539*       0.0758
+FIRE:   16 21:01:45        3.677015*       0.0592
+FIRE:   17 21:01:54        3.676536*       0.0584
+FIRE:   18 21:02:02        3.676093*       0.0540
+Validating the MEP using reference calculator...
+Dealing with image # 1 at 21:02:10.
+FIRE:   19 21:02:10        3.675739*       0.0438
+Dealing with image # 2 at 21:02:10.
+Dealing with image # 3 at 21:02:10.
+Dealing with image # 4 at 21:02:11.
+Dealing with image # 5 at 21:02:11.
+     energy_rmse =    6.3191e-04 (   1.0000e-03)
+      force_rmse =    2.4167e-02 (   5.0000e-02)
+ energy_maxresid =    1.0587e-03 (   2.0000e-03)
+  force_maxresid =    1.2555e-01 (   1.0000e-01)
+Adding 5 new images to training data.
+
+Iteration # 4
+Initial Amp calculator loaded from previous training.
+Training the Amp calculator...
+Initial MEP built from scratch.
+Running NEB using the Amp calculator...
+Climbing image switched off.
+      Step     Time          Energy         fmax
+BFGS:    0 21:02:20        4.282260        3.7784
+BFGS:    1 21:02:28        4.033144        2.6997
+BFGS:    2 21:02:37        3.863434        1.8223
+BFGS:    3 21:02:45        3.764417        1.0394
+BFGS:    4 21:02:54        3.720089        0.4135
+Climbing image switched on.
+      Step     Time          Energy         fmax
+*Force-consistent energies used in optimization.
+FIRE:    0 21:02:54        3.720089*       0.4135
+FIRE:    1 21:03:02        3.717344*       0.3726
+FIRE:    2 21:03:10        3.712640*       0.2980
+FIRE:    3 21:03:19        3.707144*       0.2030
+FIRE:    4 21:03:27        3.701866*       0.1657
+FIRE:    5 21:03:36        3.697345*       0.1492
+FIRE:    6 21:03:44        3.693707*       0.1302
+FIRE:    7 21:03:52        3.690909*       0.1362
+FIRE:    8 21:04:01        3.688749*       0.1320
+FIRE:    9 21:04:09        3.687457*       0.0991
+FIRE:   10 21:04:18        3.686951*       0.1102
+FIRE:   11 21:04:26        3.686537*       0.1250
+FIRE:   12 21:04:34        3.686368*       0.1198
+FIRE:   13 21:04:43        3.686058*       0.1097
+FIRE:   14 21:04:51        3.685653*       0.0955
+FIRE:   15 21:04:59        3.685207*       0.0782
+FIRE:   16 21:05:08        3.684773*       0.0591
+FIRE:   17 21:05:16        3.684391*       0.0585
+FIRE:   18 21:05:24        3.684079*       0.0625
+FIRE:   19 21:05:33        3.683822*       0.0598
+FIRE:   20 21:05:41        3.683640*       0.0560
+FIRE:   21 21:05:50        3.683563*       0.0475
+Dealing with image # 1 at 21:05:50.
+Dealing with image # 2 at 21:05:50.
+Dealing with image # 3 at 21:05:50.
+Dealing with image # 4 at 21:05:50.
+Dealing with image # 5 at 21:05:50.
+     energy_rmse =    3.6839e-04 (   1.0000e-03)
+      force_rmse =    1.9948e-02 (   5.0000e-02)
+ energy_maxresid =    5.4870e-04 (   2.0000e-03)
+  force_maxresid =    7.1667e-02 (   1.0000e-01)
+
+AI-NEB calculation converged.
+The MEP is saved in mep.traj.

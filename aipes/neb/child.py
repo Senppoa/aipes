@@ -21,7 +21,6 @@ rank_world = comm_world.Get_rank()
 assert rank_parent == rank_world
 
 # Fetch data from parent process
-iteration = comm_parent.bcast(None, root=0)
 neb_args = comm_parent.bcast(None, root=0)
 mep = comm_parent.bcast(None, root=0)
 label = comm_parent.bcast(None, root=0)

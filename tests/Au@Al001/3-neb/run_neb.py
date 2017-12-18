@@ -21,6 +21,36 @@ def main():
     final_file = "final.traj"
     num_inter_images = 5
 
+    # --------------------------------------------------------------------------
+    # Run the job
+    run_aineb(initial_file, final_file, num_inter_images,
+              gen_args, gen_calc_amp, gen_calc_ref)
+
+
+def gen_args(iteration=0, accuracy=None):
+    """
+    Generate controlling arguments adaptively.
+
+    Parameters
+    ----------
+    iteration: integer
+        Iteration number.
+    accuracy: dictionary
+        Discrepancy between the energies and forces as predicted by Amp and ab
+        initio calculators for images on the MEP.
+
+    Returns
+    -------
+    control_args: dictionary
+        Arguments controlling the restart and reuse behaviors.
+    dataset_args: dictionary
+        Arguments controlling the training dataset.
+    convergence: dictionary
+        Convergence criteria.
+    neb_args: dictionary
+        Arguments controlling the NEB calculation.
+    """
+    # Default settings arguments
     control_args = {
         "restart_with_calc": False,
         "restart_with_mep": False,
@@ -53,12 +83,12 @@ def main():
         "steps": [10, 40],
     }
 
-    # --------------------------------------------------------------------------
-    # Run the job
-    run_aineb(initial_file, final_file, num_inter_images,
-              control_args, dataset_args, convergence, neb_args,
-              gen_calc_amp, gen_calc_ref)
-    
+    # Adjust arguments according to iteration number and accuracy
+    # if iteration > 0 and accuracy["force_maxresid"] <= 0.5:
+    #     neb_args["steps"] = [10, 100]
+
+    return control_args, dataset_args, convergence, neb_args
+
 
 def gen_calc_amp(reload=False):
     """Returns an Amp calculator."""

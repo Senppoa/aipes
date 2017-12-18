@@ -19,8 +19,7 @@ from .common import initialize_mep, validate_mep, wash_data
 
 
 def run_aineb(initial_file, final_file, num_inter_images,
-              control_args, dataset_args, convergence, neb_args,
-              gen_calc_amp, gen_calc_ref):
+              gen_args, gen_calc_amp, gen_calc_ref):
     """
     Performs NEB calculation with first principles corrections.
 
@@ -32,14 +31,8 @@ def run_aineb(initial_file, final_file, num_inter_images,
         energies.
     num_inter_images: integer
         Number of intermediate images between initial and final images of MEP.
-    control_args: dictionary
-        Arguments controlling the restart and reuse behaviors.
-    dataset_args: dictionary
-        Arguments controlling the training dataset.
-    convergence: dictionary
-        Convergence criteria.
-    neb_args: dictionary
-        Arguments controlling the NEB calculation.
+    gen_args: function object
+        Function that generates controlling arguments adaptively.
     gen_calc_amp: function object
         Function that instantiates an Amp calculator.
     gen_calc_ref: function object
@@ -55,10 +48,13 @@ def run_aineb(initial_file, final_file, num_inter_images,
     train it and then load it from disk for each of the images. In this case,
     Amp calculators must be trained with 'overwrite=True' argument.
     """
+    # Generate the initial controlling arguments
+    control_args, dataset_args, convergence, neb_args = gen_args()
+
     # Load the initial and final images and training dataset
-    initial_image = read(initial_file, index=-1)
-    final_image = read(final_file, index=-1)
-    train_set = read(dataset_args["train_file"], index=":")
+    initial_image = read(initial_file, index=-1, parallel=False)
+    final_image = read(final_file, index=-1, parallel=False)
+    train_set = read(dataset_args["train_file"], index=":", parallel=False)
 
     # Main loop
     echo("Serial AI-NEB running on 1 process.")
@@ -135,17 +131,22 @@ def run_aineb(initial_file, final_file, num_inter_images,
         mep_save = [initial_image]
         mep_save.extend(ref_images)
         mep_save.append(final_image)
-        write("mep.traj", mep_save)
+        write("mep.traj", mep_save, parallel=False)
+
+        # Update training dataset
+        ref_images = wash_data(ref_images, dataset_args["image_fmax"])
+        echo("Adding %d new images to training data." % len(ref_images))
+        train_set.extend(ref_images)
+        write("train_new.traj", train_set, parallel=False)
+
+        # Update controlling arguments
+        (control_args, dataset_args,
+         convergence, neb_args) = gen_args(iteration+1, accuracy)
 
         # Check if convergence has been reached
         if converge_status == [True, True, True, True]:
             is_converged = True
             break
-        else:
-            ref_images = wash_data(ref_images, dataset_args["image_fmax"])
-            echo("Adding %d new images to training data." % len(ref_images))
-            train_set.extend(ref_images)
-            write("train_new.traj", train_set)
 
     # Summary
     if is_converged:
