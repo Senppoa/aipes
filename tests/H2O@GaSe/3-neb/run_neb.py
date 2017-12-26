@@ -7,7 +7,6 @@ from aipes.calculators.vasp import VaspFC as Vasp
 
 from amp.descriptor.cutoffs import Cosine
 from amp.descriptor.gaussian import Gaussian
-# from amp.descriptor.zernike import Zernike
 from amp.regression import Regressor
 from amp.model import LossFunction
 from amp.model.neuralnetwork import NeuralNetwork
@@ -56,7 +55,7 @@ def gen_args(iteration=0, accuracy=None):
     control_args = {
         "restart_with_calc": False,
         "restart_with_mep": False,
-        "reuse_calc": True,
+        "reuse_calc": False,
         "reuse_mep": False
     }
 
@@ -115,7 +114,6 @@ def gen_calc_amp(reload=False):
     # Instantiate the descriptor
     cutoff = Cosine(cutoff_radius)
     descriptor = Gaussian(cutoff=cutoff)
-    # descriptor = Zernike(cutoff=cutoff)
 
     # Instantiate the model
     regressor = Regressor(optimizer=optimizer)
