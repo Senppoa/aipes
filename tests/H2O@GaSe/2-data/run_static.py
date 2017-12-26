@@ -35,7 +35,10 @@ def main():
         image.get_potential_energy(apply_constraint=False)
         image.get_forces(apply_constraint=False)
         write("static.traj", images)
-        os.rename("OUTCAR", "OUTCAR." + str("%02d" % index))
+        if index == 0:
+            os.rename("OUTCAR", "OUTCAR.is")
+        elif index == len(images) - 1:
+            os.rename("OUTCAR", "OUTCAR.fs")
 
 
 def gen_calc():

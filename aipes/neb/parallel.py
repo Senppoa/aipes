@@ -20,19 +20,12 @@ from ..common.utilities import echo
 from .common import initialize_mep, validate_mep, wash_data
 
 
-def run_aineb(initial_file, final_file, num_inter_images,
-              gen_args, gen_calc_amp, gen_calc_ref):
+def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
     """
     Performs NEB calculation with first principles corrections.
 
     Parameters
     ----------
-    initial_file, final_file: ASE trajectory files
-        Trajectory files specifying the initial and final images of MEP. Should
-        have been assigned with single-point calculators which records reference
-        energies.
-    num_inter_images: integer
-        Number of intermediate images between initial and final images of MEP.
     gen_args: function object
         Function that generates controlling arguments adaptively.
     gen_calc_amp: function object
@@ -56,18 +49,18 @@ def run_aineb(initial_file, final_file, num_inter_images,
     'overwrite=True' argument.
     """
     # Generate the initial controlling arguments
-    control_args, dataset_args, convergence, neb_args = gen_args()
+    mep_args, control_args, dataset_args, convergence, neb_args = gen_args()
 
     # Initialize MPI environment
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()
-    assert size == num_inter_images
+    assert size == mep_args["num_inter_images"]
 
     # Load the initial and final images and training dataset
     if rank == 0:
-        initial_image = read(initial_file, index=-1, parallel=False)
-        final_image = read(final_file, index=-1, parallel=False)
+        initial_image = read(mep_args["initial_file"], index=-1, parallel=False)
+        final_image = read(mep_args["final_file"], index=-1, parallel=False)
         train_set = read(dataset_args["train_file"], index=":", parallel=False)
 
     # Main loop
@@ -103,7 +96,7 @@ def run_aineb(initial_file, final_file, num_inter_images,
                (iteration != 0 and control_args["reuse_mep"] is False)):
                 echo("Initial MEP built from scratch.", rank)
                 mep = initialize_mep(initial_image, final_image,
-                                     num_inter_images, neb_args)
+                                     mep_args["num_inter_images"], neb_args)
             else:
                 echo("Initial MEP loaded from mep.traj.", rank)
                 mep = read("mep.traj", index=":", parallel=False)
@@ -174,7 +167,7 @@ def run_aineb(initial_file, final_file, num_inter_images,
             write("train_new.traj", train_set, parallel=False)
 
         # Update controlling arguments
-        (control_args, dataset_args,
+        (mep_args, control_args, dataset_args,
          convergence, neb_args) = gen_args(iteration+1, accuracy)
 
         # Check if convergence has been reached

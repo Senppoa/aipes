@@ -5,26 +5,12 @@ from ase.calculators.emt import EMT
 
 from amp.descriptor.cutoffs import Cosine
 from amp.descriptor.gaussian import Gaussian
-# from amp.descriptor.zernike import Zernike
 from amp.regression import Regressor
 from amp.model import LossFunction
 from amp.model.neuralnetwork import NeuralNetwork
 from amp import Amp
 
 from aipes.neb.dynamic import run_aineb
-
-
-def main():
-    # --------------------------------------------------------------------------
-    # Declare controlling parameters
-    initial_file = "initial.traj"
-    final_file = "final.traj"
-    num_inter_images = 5
-
-    # --------------------------------------------------------------------------
-    # Run the job
-    run_aineb(initial_file, final_file, num_inter_images,
-              gen_args, gen_calc_amp, gen_calc_ref)
 
 
 def gen_args(iteration=0, accuracy=None):
@@ -41,6 +27,9 @@ def gen_args(iteration=0, accuracy=None):
 
     Returns
     -------
+    mep_args: dictionary
+        Arguments specifying the initial and final images of the MEP, and the
+        number of intermediate images.
     control_args: dictionary
         Arguments controlling the restart and reuse behaviors.
     dataset_args: dictionary
@@ -51,10 +40,16 @@ def gen_args(iteration=0, accuracy=None):
         Arguments controlling the NEB calculation.
     """
     # Default settings arguments
+    mep_args = {
+        "initial_file": "initial.traj",
+        "final_file": "final.traj",
+        "num_inter_images": 5
+    }
+
     control_args = {
         "restart_with_calc": False,
         "restart_with_mep": False,
-        "reuse_calc": True,
+        "reuse_calc": False,
         "reuse_mep": False
     }
 
@@ -87,7 +82,7 @@ def gen_args(iteration=0, accuracy=None):
     # if iteration > 0 and accuracy["force_maxresid"] <= 0.5:
     #     neb_args["steps"] = [10, 100]
 
-    return control_args, dataset_args, convergence, neb_args
+    return mep_args, control_args, dataset_args, convergence, neb_args
 
 
 def gen_calc_amp(reload=False):
@@ -113,7 +108,6 @@ def gen_calc_amp(reload=False):
     # Instantiate the descriptor
     cutoff = Cosine(cutoff_radius)
     descriptor = Gaussian(cutoff=cutoff)
-    # descriptor = Zernike(cutoff=cutoff)
 
     # Instantiate the model
     regressor = Regressor(optimizer=optimizer)
@@ -140,4 +134,4 @@ def gen_calc_ref():
 
 
 if __name__ == "__main__":
-    main()
+    run_aineb(gen_args, gen_calc_amp, gen_calc_ref)
