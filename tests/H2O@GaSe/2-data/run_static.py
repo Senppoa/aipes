@@ -27,6 +27,19 @@ def main():
     images = interpolate(initial_image, final_image, num_inter_images,
                          interp, mic)
 
+    # Output to POSCAR files for inspection
+    if os.path.exists("poscar.i"):
+        os.system("rm poscar.i/*")
+    else:
+        os.mkdir("poscar.i")
+    for index, image in enumerate(images):
+        if index == 0:
+            write("poscar.i/POSCAR.is", image, format="vasp")
+        elif index == len(images) - 1:
+            write("poscar.i/POSCAR.fs", image, format="vasp")
+        else:
+            write(str("poscar.i/POSCAR.%03d" % index), image, format="vasp")
+
     # Calculate potential energy and forces for each image in images
     for index, image in enumerate(images):
         t0 = time.strftime("%H:%M:%S")
