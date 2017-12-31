@@ -24,7 +24,3 @@ For installation instructions, see doc/install.md.
 
 The examples under the 'test' directory act as benchmarks as well as tutorials.
 See test/tutorials.md for more instructions.
-
-Homepage of ASE: https://wiki.fysik.dtu.dk/ase/
-
-Homepage of Amp: https://bitbucket.org/andrewpeterson/amp
