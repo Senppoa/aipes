@@ -50,12 +50,14 @@ def gen_args(iteration=0, accuracy=None):
         "restart_with_calc": False,
         "restart_with_mep": False,
         "reuse_calc": False,
-        "reuse_mep": False
+        "reuse_mep": False,
+        "annealing": True
     }
 
     dataset_args = {
         "train_file": "train.traj",
-        "image_fmax": 10.0
+        "image_fmax": 10.0,
+        "image_dE": 5.0
     }
 
     convergence = {

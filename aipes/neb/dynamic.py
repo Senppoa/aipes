@@ -14,8 +14,10 @@ from ase.io import read, write
 
 from mpi4py import MPI
 
+from amp.utilities import Annealer
+
 from ..common.utilities import echo
-from .common import initialize_mep, validate_mep, wash_data
+from .common import initialize_mep, validate_mep, cluster_data
 
 
 def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
@@ -52,7 +54,8 @@ def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
     # Load the initial and final images and training dataset
     initial_image = read(mep_args["initial_file"], index=-1, parallel=False)
     final_image = read(mep_args["final_file"], index=-1, parallel=False)
-    train_set = read(dataset_args["train_file"], index=":", parallel=False)
+    full_set = read(dataset_args["train_file"], index=":", parallel=False)
+    train_set = cluster_data(full_set, dataset_args)
 
     # Main loop
     echo("Dynamic AI-NEB running on %d MPI processes." %
@@ -71,6 +74,8 @@ def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
             reload = True
         calc_amp = gen_calc_amp(reload=reload)
         echo("Training the Amp calculator...")
+        if control_args["annealing"] is True:
+            Annealer(calc=calc_amp, images=train_set)
         calc_amp.train(images=train_set, overwrite=True)
         label = calc_amp.label
 
@@ -84,7 +89,7 @@ def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
             echo("Initial MEP loaded from mep.traj.")
             mep = read("mep.traj", index=":", parallel=False)
 
-        # Spawn MPI child processes and run NEB
+        # Spawn MPI child processes to calculate the MEP from initial guess
         echo("Running NEB using the Amp calculator...")
         comm = MPI.COMM_SELF.Spawn(sys.executable,
                                    args=["-m", "aipes.neb.child"],
@@ -113,10 +118,10 @@ def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
         write("mep.traj", mep_save, parallel=False)
 
         # Update training dataset
-        ref_images = wash_data(ref_images, dataset_args["image_fmax"])
-        echo("Adding %d new images to training data." % len(ref_images))
-        train_set.extend(ref_images)
-        write("train_new.traj", train_set, parallel=False)
+        full_set.extend(ref_images)
+        train_set = cluster_data(full_set, dataset_args)
+        echo("Size of training dataset after clustering: %d." % len(train_set))
+        write("train_new.traj", full_set, parallel=False)
 
         # Update controlling arguments
         (mep_args, control_args, dataset_args,

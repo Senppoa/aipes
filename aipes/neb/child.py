@@ -25,13 +25,11 @@ neb_args = comm_parent.bcast(None, root=0)
 mep = comm_parent.bcast(None, root=0)
 label = comm_parent.bcast(None, root=0)
 
-# Prepare MEP for NEB calculation
+# Assign calculator to the active image
 calc_amp = Amp.load(label+".amp", cores=1, label=label, logging=False)
 mep[rank_world+1].set_calculator(calc_amp)
 
 # Run NEB
-# Both non-CI and CI NEB require non-CI steps specified by
-# neb_args["steps"][0]. So we set climb=False at the beginning.
 assert (len(neb_args["climb"]) ==
         len(neb_args["opt_algorithm"]) ==
         len(neb_args["fmax"]) ==

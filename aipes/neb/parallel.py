@@ -15,9 +15,10 @@ from ase.optimize import BFGS, FIRE
 from mpi4py import MPI
 
 from amp import Amp
+from amp.utilities import Annealer
 
 from ..common.utilities import echo
-from .common import initialize_mep, validate_mep, wash_data
+from .common import initialize_mep, validate_mep, cluster_data
 
 
 def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
@@ -61,7 +62,8 @@ def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
     if rank == 0:
         initial_image = read(mep_args["initial_file"], index=-1, parallel=False)
         final_image = read(mep_args["final_file"], index=-1, parallel=False)
-        train_set = read(dataset_args["train_file"], index=":", parallel=False)
+        full_set = read(dataset_args["train_file"], index=":", parallel=False)
+        train_set = cluster_data(full_set, dataset_args)
 
     # Main loop
     echo("Parallel AI-NEB running on %d MPI processes." % size, rank)
@@ -83,6 +85,8 @@ def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
                 reload = True
             calc_amp = gen_calc_amp(reload=reload)
             echo("Training the Amp calculator...", rank)
+            if control_args["annealing"] is True:
+                Annealer(calc=calc_amp, images=train_set)
             calc_amp.train(images=train_set, overwrite=True)
             label = calc_amp.label
         else:
@@ -161,10 +165,11 @@ def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
 
         # Update training dataset
         if rank == 0:
-            ref_images = wash_data(ref_images, dataset_args["image_fmax"])
-            echo("Adding %d new images to training data." % len(ref_images))
-            train_set.extend(ref_images)
-            write("train_new.traj", train_set, parallel=False)
+            full_set.extend(ref_images)
+            train_set = cluster_data(full_set, dataset_args)
+            echo("Size of training dataset after clustering: %d." %
+                 len(train_set))
+            write("train_new.traj", full_set, parallel=False)
 
         # Update controlling arguments
         (mep_args, control_args, dataset_args,

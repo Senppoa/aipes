@@ -9,8 +9,9 @@ validate_mep:
     Check the difference between energies/forces produced by Amp and first
     principles calculators for images along the MEP to determine if convergence
     has been reached.
-wash_data:
-    Remove images in the training data set that will degrade training quality.
+cluster_data:
+    Cluster the full data into training and remaining datasets in order to avoid
+    fitting problems.
 """
 
 import time
@@ -78,13 +79,18 @@ def validate_mep(mep, calc_amp, gen_calc_ref):
         image_copy = image.copy()
         image_copy.set_calculator(gen_calc_ref())
 
-        # The energy may be extracted at the same time as evaluating forces.
-        # So we calculate the forces first to save time.
-        image_copy.get_forces(apply_constraint=False)
-        image_copy.get_potential_energy(apply_constraint=False)
-
-        # Append image_copy to ref_images for improving the training database
-        ref_images.append(image_copy)
+        # For the first few iterations NEB may produce unphysical intermediate
+        # images, and the forces and energy calls are likely to fail. We have to
+        # handle this exception here.
+        try:
+            image_copy.get_forces(apply_constraint=False)
+            image_copy.get_potential_energy(apply_constraint=False)
+        except UnboundLocalError:
+            echo("Error occurred while evaluating forces/energy.")
+            echo("Image discarded.")
+            pass
+        else:
+            ref_images.append(image_copy)
 
     # Calculate RMSE and MaxResid
     energy_rmse, energy_maxresid = validate_energy(calc_amp, ref_images)
@@ -95,12 +101,19 @@ def validate_mep(mep, calc_amp, gen_calc_ref):
     return accuracy, ref_images
 
 
-def wash_data(raw_data, fmax=10.0):
-    """Remove images that will degrade training quality."""
-    washed_data = []
-    for image in raw_data:
+def cluster_data(full_set, dataset_args):
+    """
+    Cluster the full data into training and remaining datasets in order to avoid
+    fitting problems. Only the training dataset is returned.
+    """
+    mean_epot = np.array([image.get_potential_energy(apply_constraint=False)
+                          for image in full_set]).mean()
+    train_set = []
+    for image in full_set:
         forces = image.get_forces(apply_constraint=False)
         forces_mod = np.array([np.sqrt(np.sum(v**2)) for v in forces])
-        if np.max(forces_mod) <= fmax:
-            washed_data.append(image)
-    return washed_data
+        epot = image.get_potential_energy(apply_constraint=False)
+        if (np.max(forces_mod) <= dataset_args["image_fmax"] and
+           abs(epot-mean_epot) <= dataset_args["image_dE"]):
+            train_set.append(image)
+    return train_set
