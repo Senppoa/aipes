@@ -139,6 +139,14 @@ def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
         # the image.
         mep = comm.gather(mep[rank+1].copy(), root=0)
 
+        # The validation of MEP is very time-consuming. Here we save MEP without
+        # energies and forces for inspection.
+        if rank == 0:
+            mep_chk = [initial_image]
+            mep_chk.extend(mep)
+            mep_chk.append(final_image)
+            write("chk.traj", mep_chk, parallel=False)
+
         # Validate the MEP against the reference calculator
         echo("Validating the MEP using reference calculator...", rank)
         if rank == 0:

@@ -112,6 +112,10 @@ def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
             opt_runner.run(fmax=neb_args["fmax"][stage],
                            steps=neb_args["steps"][stage])
 
+        # The validation of MEP is very time-consuming. Here we save MEP without
+        # energies and forces for inspection.
+        write("chk.traj", mep, parallel=False)
+
         # Validate the MEP against the reference calculator
         # Note that for serial version of run_aineb we have to pass mep[1:-1]
         # to validate_mep instead of the whole mep.

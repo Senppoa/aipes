@@ -101,6 +101,13 @@ def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
         mep = comm.gather(active_image, root=MPI.ROOT)
         comm.Disconnect()
 
+        # The validation of MEP is very time-consuming. Here we save MEP without
+        # energies and forces for inspection.
+        mep_chk = [initial_image]
+        mep_chk.extend(mep)
+        mep_chk.append(final_image)
+        write("chk.traj", mep_chk, parallel=False)
+
         # Validate the MEP against the reference calculator
         echo("Validating the MEP using reference calculator...")
         accuracy, ref_images = validate_mep(mep, calc_amp, gen_calc_ref)

@@ -85,8 +85,12 @@ def validate_mep(mep, calc_amp, gen_calc_ref):
         try:
             image_copy.get_forces(apply_constraint=False)
             image_copy.get_potential_energy(apply_constraint=False)
+        except RuntimeError:
+            echo("ERROR: reference code exited abnormally.")
+            echo("Image discarded.")
+            pass
         except UnboundLocalError:
-            echo("Error occurred while evaluating forces/energy.")
+            echo("ERROR: forces/energy evaluation failed.")
             echo("Image discarded.")
             pass
         else:
