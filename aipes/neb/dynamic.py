@@ -106,7 +106,7 @@ def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
         mep_chk = [initial_image]
         mep_chk.extend(mep)
         mep_chk.append(final_image)
-        write("chk.traj", mep_chk, parallel=False)
+        write("chk_%d.traj" % (iteration+1), mep_chk, parallel=False)
 
         # Validate the MEP against the reference calculator
         echo("Validating the MEP using reference calculator...")
@@ -122,13 +122,13 @@ def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
         mep_save = [initial_image]
         mep_save.extend(ref_images)
         mep_save.append(final_image)
-        write("mep.traj", mep_save, parallel=False)
+        write("mep_%d.traj" % (iteration+1), mep_save, parallel=False)
 
         # Update training dataset
         full_set.extend(ref_images)
         train_set = cluster_data(full_set, dataset_args)
         echo("Size of training dataset after clustering: %d." % len(train_set))
-        write("train_new.traj", full_set, parallel=False)
+        write("train.traj", full_set, parallel=False)
 
         # Update controlling arguments
         (mep_args, control_args, dataset_args,
@@ -142,7 +142,7 @@ def run_aineb(gen_args, gen_calc_amp, gen_calc_ref):
     # Summary
     if is_converged:
         echo("\nAI-NEB calculation converged."
-             "\nThe MEP is saved in mep.traj.")
+             "\nThe MEP is saved in mep_%d.traj." % (iteration+1))
     else:
         echo("\nMaximum iteration number reached."
              "\nAI-NEB calculation not converged.")
