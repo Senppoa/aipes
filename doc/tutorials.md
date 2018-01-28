@@ -69,12 +69,12 @@ energies and forces. See 'ref' directory for examples of the output.
 
 ## Step 3: Running NEB calculation
 
-Finally we come to the 3rd step. Go to the '3-neb' directory and link the
+Finally we come to the 3rd step. Go to the '3-neb' directory and link/copy the
 necessary files:
 
     ln -s ../1-opt/initial.traj .
     ln -s ../1-opt/final.traj .
-    ln -s ../2-data/static.traj train.traj
+    cp ../2-data/static.traj train.traj
 
 Note that 'staric.traj' should be renamed to 'train.traj'.
 
